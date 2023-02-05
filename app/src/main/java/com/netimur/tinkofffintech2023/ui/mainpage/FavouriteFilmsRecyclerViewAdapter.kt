@@ -1,6 +1,7 @@
 package com.netimur.tinkofffintech2023.ui.mainpage
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +22,31 @@ class FavouriteFilmsRecyclerViewAdapter(
 ) :
     RecyclerView.Adapter<FavouriteFilmsRecyclerViewAdapter.FavouriteFilmCardViewHolder>(),
     RemoveCallback {
-    private val favouriteFilms: MutableList<FilmCardRepresentation> = films.toMutableList()
+    private var favouriteFilms: MutableList<FilmCardRepresentation> = films.toMutableList()
+    private var tempFilms: MutableList<FilmCardRepresentation> = favouriteFilms
+
+
+    fun search(searchParameter: String) {
+        if (searchParameter.isEmpty()) {
+            favouriteFilms = tempFilms
+        } else {
+            val filmCardRepresentations: List<FilmCardRepresentation>? =
+                favouriteFilms.filter {
+                    it.name.lowercase()
+                        .startsWith(searchParameter.lowercase(), true) ||
+                            it.name.lowercase().contains(searchParameter.lowercase())
+                } as ArrayList
+            if (filmCardRepresentations != null) {
+                updateList(filmCardRepresentations)
+                Log.d("SearchTag", filmCardRepresentations.toString())
+            }
+        }
+    }
+
+    private fun updateList(filmCardRepresentations: List<FilmCardRepresentation>) {
+        this.favouriteFilms = filmCardRepresentations.toMutableList()
+        notifyDataSetChanged()
+    }
 
     override fun onRemove(film: FilmCardRepresentation, position: Int) {
         favouriteFilms.remove(film)

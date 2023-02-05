@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.netimur.tinkofffintech2023.data.FilmRepository
 import com.netimur.tinkofffintech2023.data.FilmRepositoryImplementation
@@ -17,8 +18,31 @@ import com.netimur.tinkofffintech2023.databinding.FilmItemBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 
-class FilmsRecyclerViewAdapter(private val filmCardRepresentations: List<FilmCardRepresentation>) :
+class FilmsRecyclerViewAdapter(private var filmCardRepresentations: List<FilmCardRepresentation>) :
     RecyclerView.Adapter<FilmsRecyclerViewAdapter.FilmViewHolder>() {
+    private val fullList: List<FilmCardRepresentation> = filmCardRepresentations.toList()
+
+    fun search(searchParameter: String) {
+        if (searchParameter.isEmpty()) {
+            filmCardRepresentations = fullList
+        } else {
+            val filmCardRepresentations: List<FilmCardRepresentation>? =
+                filmCardRepresentations.filter {
+                    it.name.lowercase()
+                        .startsWith(searchParameter.lowercase(), true) ||
+                            it.name.lowercase().contains(searchParameter.lowercase())
+                } as ArrayList
+            if (filmCardRepresentations != null) {
+                updateList(filmCardRepresentations)
+                Log.d("SearchTag", filmCardRepresentations.toString())
+            }
+        }
+    }
+
+    private fun updateList(filmCardRepresentations: List<FilmCardRepresentation>) {
+        this.filmCardRepresentations = filmCardRepresentations
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -53,11 +77,16 @@ class FilmsRecyclerViewAdapter(private val filmCardRepresentations: List<FilmCar
                 filmYear.text = "(${filmCardRepresentation.year})"
                 root.apply {
                     setOnClickListener(View.OnClickListener {
-                        val action =
-                            MainPageFragmentDirections.actionMainPageFragmentToFilmDetailsFragment(
-                                filmCardRepresentation.id
-                            )
-                        Navigation.findNavController(binding.root).navigate(action)
+                        try {
+                            val action =
+                                MainPageFragmentDirections.actionMainPageFragmentToFilmDetailsFragment(
+                                    filmCardRepresentation.id
+                                )
+                            Navigation.findNavController(binding.root).navigate(action)
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
+                        }
+
                     })
                     setOnLongClickListener(OnLongClickListener {
                         GlobalScope.launch(Dispatchers.IO) {

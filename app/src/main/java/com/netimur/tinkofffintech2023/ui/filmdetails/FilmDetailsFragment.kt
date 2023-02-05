@@ -15,7 +15,6 @@ import com.netimur.tinkofffintech2023.databinding.FragmentFilmDetailsBinding
 import com.netimur.tinkofffintech2023.ui.mainpage.TopFilmsViewModel
 import com.squareup.picasso.Picasso
 
-
 class FilmDetailsFragment : Fragment() {
     private var binding: FragmentFilmDetailsBinding? = null
     private val viewModel: FilmDetailsViewModel by viewModels { FilmDetailsViewModel.Factory }
@@ -39,18 +38,17 @@ class FilmDetailsFragment : Fragment() {
                 loadDetails()
             }
         }
-
         return view
     }
 
     private fun setViewModelObserver() {
-        viewModel.shortFilmDetails.observe(viewLifecycleOwner, Observer {
+        viewModel.shortFilmDetails.observe(viewLifecycleOwner) {
             if (it is EmptyFilmDetails) {
                 emptyDetails()
             } else {
                 showDetails(it)
             }
-        })
+        }
     }
 
     private fun emptyDetails() {

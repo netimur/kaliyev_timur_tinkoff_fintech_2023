@@ -31,32 +31,41 @@ class TopFilmsViewModel(private val context: Context) : ViewModel() {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun getTopFilms() {
-        GlobalScope.launch(Dispatchers.IO) {
-            val topFilms: MutableMap<Int, TopFilm> = HashMap()
-            val topFilmsFromNetwork: List<TopFilm> = filmRepository.getTopFilms()
-            if (topFilmsFromNetwork.isEmpty()) {
-                topFilmsCardRepresentations.postValue(LinkedList())
-            } else {
-                for (film in topFilmsFromNetwork) {
-                    topFilms[film.filmId] = film
-                }
-                val repositoryFilms: MutableMap<Int, FilmCardRepresentation> = HashMap()
-                val repositoryFilmsList = filmRepository.getFavouriteFilms()
-                for (film in repositoryFilmsList) {
-                    repositoryFilms[film.id] = film
-                }
-                val resultTopList: MutableList<FilmCardRepresentation> = ArrayList()
-                for (entry in topFilms.entries.iterator()) {
-                    val card: FilmCardRepresentation =
-                        entry.value.mapToFilmCardRepresentation()
-                    if (repositoryFilms.containsKey(entry.key)) {
-                        card.isFavourite = true
-                    }
-                    resultTopList.add(card)
-                    topFilmsCardRepresentations.postValue(resultTopList)
+        if (topFilmsCardRepresentations.value?.isNotEmpty() == true) {
+            topFilmsCardRepresentations.value = topFilmsCardRepresentations.value
+        } else {
+            GlobalScope.launch(Dispatchers.IO) {
+                val topFilmsFromNetwork: List<TopFilm> = filmRepository.getTopFilms()
+
+                if (topFilmsFromNetwork.isEmpty()) {
+                    topFilmsCardRepresentations.postValue(LinkedList())
+                } else {
+                    val repositoryFilmsList = filmRepository.getFavouriteFilms()
+                    val resultList: List<FilmCardRepresentation> =
+                        markFavouriteFilms(topFilmsFromNetwork, repositoryFilmsList)
+                    topFilmsCardRepresentations.postValue(resultList)
                 }
             }
         }
+    }
+    private fun markFavouriteFilms(
+        filmsFromNetwork: List<TopFilm>,
+        favouriteFilms: List<FilmCardRepresentation>
+    ): List<FilmCardRepresentation> {
+        val filmCardRepresentations: MutableList<FilmCardRepresentation> = ArrayList()
+        val favouriteFilmsIds: MutableSet<Int> = HashSet<Int>()
+        for (element in favouriteFilms) {
+            favouriteFilmsIds.add(element.id)
+        }
+
+        for (i in filmsFromNetwork.indices) {
+            val filmCard = filmsFromNetwork[i].mapToFilmCardRepresentation()
+            if (favouriteFilmsIds.contains(filmsFromNetwork[i].filmId)) {
+                filmCard.isFavourite = true
+            }
+            filmCardRepresentations.add(filmCard)
+        }
+        return filmCardRepresentations
     }
 
     @OptIn(DelicateCoroutinesApi::class)

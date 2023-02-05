@@ -10,4 +10,5 @@
     <string name="genre">Жанр:</string>
     <string name="countries">Страны:</string>
     <string name="you_have_no_favourite_films">у Вас нет избранных фильмов</string>
+    <string name="search">Поиск</string>
 </resources>
