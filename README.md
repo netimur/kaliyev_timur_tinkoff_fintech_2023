@@ -11,7 +11,7 @@ Kotlin coroutines are used in purpose to perform long-performing operations such
 Application code is written using clean code and SOLID principles
 
 Application gets list of popular films from Kinopoisk unofficial API and represents it in UI
-User can check film details (Select interestring film -> Tap it card)
+User can check film details (Select interesting film -> Tap it card)
 User can add film from the top films list to favourites list by long click film card
 User sees a list of favourites films in appropriate section in main page
 Favourite films' cards are stored in local database, so user can see them without internet connection
@@ -33,3 +33,5 @@ Also:
 2. Performance well optimized
 3. Progress bars are shown
 4. Response caching
+
+Application tested using different screen size virtual devices (3,7 WVGA, Nexus One, Pixel 6 Pro) and Developer's physical device
