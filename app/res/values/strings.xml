@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Tinkoff Fintech 2023</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="movie_poster">movie poster</string>
+    <string name="internet_error_message">Произошла ошибка при загрузке данных,\n проверьте подключение к сети</string>
+    <string name="retry">Повторить</string>
+</resources>
