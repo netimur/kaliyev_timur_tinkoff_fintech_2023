@@ -3,8 +3,6 @@ package com.netimur.tinkofffintech2023.data
 import com.netimur.tinkofffintech2023.data.model.FilmCardRepresentation
 import com.netimur.tinkofffintech2023.data.model.FilmResponseBody
 import com.netimur.tinkofffintech2023.data.model.TopFilm
-import com.netimur.tinkofffintech2023.data.model.TopFilmsResponseBody
-import com.netimur.tinkofffintech2023.data.network.ServerCallback
 
 interface FilmRepository {
     suspend fun getFavouriteFilms(): List<FilmCardRepresentation>

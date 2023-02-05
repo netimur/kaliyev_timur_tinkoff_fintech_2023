@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.netimur.tinkofffintech2023.data.model.ShortFilmDetails
-import com.netimur.tinkofffintech2023.data.model.FilmResponseBody
 import com.netimur.tinkofffintech2023.common.mapToShortFilmDetails
 import com.netimur.tinkofffintech2023.data.FilmRepository
 import com.netimur.tinkofffintech2023.data.FilmRepositoryImplementation
@@ -18,7 +16,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class FilmDetailsViewModel(private val context: Context) : ViewModel() {
-    private lateinit var film: FilmResponseBody
     val shortFilmDetails: MutableLiveData<ShortFilmDetails> = MutableLiveData()
     private val filmRepository: FilmRepository = FilmRepositoryImplementation(context)
 

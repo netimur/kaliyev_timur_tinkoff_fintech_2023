@@ -1,42 +1,28 @@
 package com.netimur.tinkofffintech2023.ui.mainpage
 
-import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnLongClickListener
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutManager
-import com.google.android.material.snackbar.Snackbar
-import com.netimur.tinkofffintech2023.data.FilmRepository
-import com.netimur.tinkofffintech2023.data.FilmRepositoryImplementation
 import com.netimur.tinkofffintech2023.data.model.FilmCardRepresentation
 import com.netimur.tinkofffintech2023.databinding.FilmItemBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 
-class FilmsRecyclerViewAdapter(private var filmCardRepresentations: List<FilmCardRepresentation>) :
+class FilmsRecyclerViewAdapter(
+    private var filmCardRepresentations: List<FilmCardRepresentation>,
+    private val viewModel: TopFilmsViewModel
+) :
     RecyclerView.Adapter<FilmsRecyclerViewAdapter.FilmViewHolder>() {
     private val fullList: List<FilmCardRepresentation> = filmCardRepresentations.toList()
-
-    fun search(searchParameter: String) {
-        if (searchParameter.isEmpty()) {
-            filmCardRepresentations = fullList
-        } else {
-            val filmCardRepresentations: List<FilmCardRepresentation>? =
-                filmCardRepresentations.filter {
-                    it.name.lowercase()
-                        .startsWith(searchParameter.lowercase(), true) ||
-                            it.name.lowercase().contains(searchParameter.lowercase())
-                } as ArrayList
-            if (filmCardRepresentations != null) {
-                updateList(filmCardRepresentations)
-                Log.d("SearchTag", filmCardRepresentations.toString())
-            }
+    fun search(text: String) {
+        updateList(fullList)
+        val filteredList = filmCardRepresentations.filter { item ->
+            item.name.contains(text, ignoreCase = true)
         }
+        updateList(filteredList)
     }
 
     private fun updateList(filmCardRepresentations: List<FilmCardRepresentation>) {
@@ -47,7 +33,7 @@ class FilmsRecyclerViewAdapter(private var filmCardRepresentations: List<FilmCar
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilmViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = FilmItemBinding.inflate(layoutInflater, parent, false)
-        return FilmViewHolder(binding, parent.context)
+        return FilmViewHolder(binding, viewModel)
     }
 
     override fun getItemCount(): Int {
@@ -62,11 +48,10 @@ class FilmsRecyclerViewAdapter(private var filmCardRepresentations: List<FilmCar
 
     class FilmViewHolder(
         private val binding: FilmItemBinding,
-        private val context: Context
+        private val viewModel: TopFilmsViewModel
     ) :
         RecyclerView.ViewHolder(binding.root) {
         private lateinit var filmCardRepresentation: FilmCardRepresentation
-        private val repository: FilmRepository = FilmRepositoryImplementation(context)
 
         @OptIn(DelicateCoroutinesApi::class)
         fun bindData(filmCardRepresentation: FilmCardRepresentation) {
@@ -76,7 +61,7 @@ class FilmsRecyclerViewAdapter(private var filmCardRepresentations: List<FilmCar
                 filmGenre.text = filmCardRepresentation.genre
                 filmYear.text = "(${filmCardRepresentation.year})"
                 root.apply {
-                    setOnClickListener(View.OnClickListener {
+                    setOnClickListener {
                         try {
                             val action =
                                 MainPageFragmentDirections.actionMainPageFragmentToFilmDetailsFragment(
@@ -86,28 +71,10 @@ class FilmsRecyclerViewAdapter(private var filmCardRepresentations: List<FilmCar
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
-
-                    })
+                    }
                     setOnLongClickListener(OnLongClickListener {
-                        GlobalScope.launch(Dispatchers.IO) {
-                            repository.addFavouriteFilm(filmCardRepresentation)
-                        }
-                        filmCardRepresentation.isFavourite = true
+                        viewModel.addFavouriteFilm(filmCardRepresentation)
                         binding.favouriteStar.visibility = View.VISIBLE
-                        val snackbar = Snackbar.make(
-                            binding.root,
-                            "Фильм добавлен в избранное",
-                            Snackbar.LENGTH_SHORT
-                        )
-                        snackbar.setAction("Отменить", View.OnClickListener {
-                            GlobalScope.launch(Dispatchers.IO) {
-                                repository.deleteFavouriteFilm(filmCardRepresentation)
-                            }
-                            filmCardRepresentation.isFavourite = false
-                            binding.favouriteStar.visibility = View.INVISIBLE
-                        })
-                        snackbar.show()
-
                         return@OnLongClickListener true
                     })
                 }

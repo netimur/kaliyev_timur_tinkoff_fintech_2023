@@ -58,14 +58,15 @@
         android:layout_marginTop="@dimen/regular_margin"
         android:hint="@string/search"
         android:visibility="invisible"
-        app:boxStrokeColor="@color/white"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        app:hintTextAppearance="@style/TextAppearance.CommonTypography"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/back_button"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 

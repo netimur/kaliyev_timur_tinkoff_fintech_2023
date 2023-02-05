@@ -19,13 +19,11 @@ import java.util.LinkedList
 
 class TopFilmsViewModel(private val context: Context) : ViewModel() {
     private val filmRepository: FilmRepository = FilmRepositoryImplementation(context)
-    val filmsList: MutableLiveData<List<TopFilm>> = MutableLiveData()
     val topFilmsCardRepresentations: MutableLiveData<List<FilmCardRepresentation>> =
         MutableLiveData()
-    val favouriteFilms: MutableLiveData<List<FilmCardRepresentation>> = MutableLiveData()
+    val favouriteFilms: MutableLiveData<MutableList<FilmCardRepresentation>> = MutableLiveData()
 
     init {
-        filmsList.value = ArrayList()
         getTopFilms()
     }
 
@@ -42,18 +40,19 @@ class TopFilmsViewModel(private val context: Context) : ViewModel() {
                 } else {
                     val repositoryFilmsList = filmRepository.getFavouriteFilms()
                     val resultList: List<FilmCardRepresentation> =
-                        markFavouriteFilms(topFilmsFromNetwork, repositoryFilmsList)
+                        mergeFilms(topFilmsFromNetwork, repositoryFilmsList)
                     topFilmsCardRepresentations.postValue(resultList)
                 }
             }
         }
     }
-    private fun markFavouriteFilms(
+
+    private fun mergeFilms(
         filmsFromNetwork: List<TopFilm>,
         favouriteFilms: List<FilmCardRepresentation>
     ): List<FilmCardRepresentation> {
         val filmCardRepresentations: MutableList<FilmCardRepresentation> = ArrayList()
-        val favouriteFilmsIds: MutableSet<Int> = HashSet<Int>()
+        val favouriteFilmsIds: MutableSet<Int> = HashSet()
         for (element in favouriteFilms) {
             favouriteFilmsIds.add(element.id)
         }
@@ -76,9 +75,50 @@ class TopFilmsViewModel(private val context: Context) : ViewModel() {
             if (localFavouriteFilms.isEmpty()) {
                 favouriteFilms.postValue(ArrayList())
             } else {
-                favouriteFilms.postValue(localFavouriteFilms)
+                favouriteFilms.postValue(localFavouriteFilms.toMutableList())
             }
         }
+    }
+
+    fun addFavouriteFilm(film: FilmCardRepresentation) {
+        markFilmAsFavourite(film)
+        GlobalScope.launch(Dispatchers.IO) {
+            filmRepository.addFavouriteFilm(film)
+        }
+    }
+
+    private fun markFilmAsFavourite(film: FilmCardRepresentation) {
+        val favouriteFilmIndex: Int? = topFilmsCardRepresentations.value?.indexOf(film)
+        topFilmsCardRepresentations.value?.get(favouriteFilmIndex!!)?.isFavourite = true
+        addFavouriteFilmToFavouritesList(film)
+    }
+
+    private fun addFavouriteFilmToFavouritesList(film: FilmCardRepresentation) {
+        favouriteFilms.value?.add(film)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun deleteFavouriteFilm(film: FilmCardRepresentation) {
+        deleteFavouriteFilmFromTopFilms(film)
+        deleteFilmFromFavouriteFilms(film)
+        GlobalScope.launch(Dispatchers.IO) {
+            filmRepository.deleteFavouriteFilm(film)
+        }
+    }
+
+    private fun deleteFavouriteFilmFromTopFilms(film: FilmCardRepresentation) {
+        val topListFilmIndex: Int = topFilmsCardRepresentations.value!!.indexOf(film)
+        topFilmsCardRepresentations.value!![topListFilmIndex].isFavourite = false
+    }
+
+    private fun deleteFilmFromFavouriteFilms(film: FilmCardRepresentation) {
+        val favouriteListFilmIndex: Int? = favouriteFilms.value?.indexOf(film)
+        val favouriteFilmsList: MutableList<FilmCardRepresentation> =
+            LinkedList(favouriteFilms.value ?: ArrayList())
+        if (favouriteListFilmIndex != null) {
+            favouriteFilmsList.removeAt(favouriteListFilmIndex)
+        }
+        favouriteFilms.value = favouriteFilmsList
     }
 
     companion object {

@@ -1,12 +1,10 @@
 package com.netimur.tinkofffintech2023.data.network
 
 import android.content.Context
-import com.netimur.tinkofffintech2023.BuildConfig
 import com.netimur.tinkofffintech2023.common.Constants
 import com.netimur.tinkofffintech2023.common.InternetConnection
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

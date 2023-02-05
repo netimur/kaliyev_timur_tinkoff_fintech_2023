@@ -1,11 +1,8 @@
 package com.netimur.tinkofffintech2023.data.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-//@Entity(tableName = "films")
+
 open class FilmResponseBody(
-    //@PrimaryKey
     val kinopoiskId: Int,
     val imdbId: String,
     val nameRu: String,

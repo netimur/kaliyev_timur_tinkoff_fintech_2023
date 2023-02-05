@@ -3,7 +3,6 @@ package com.netimur.tinkofffintech2023.data.network
 import com.netimur.tinkofffintech2023.common.Constants
 import com.netimur.tinkofffintech2023.data.model.FilmResponseBody
 import com.netimur.tinkofffintech2023.data.model.TopFilmsResponseBody
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers
@@ -22,7 +21,7 @@ interface ApiService {
         Constants.API_KEY_HEADER,
         Constants.CONTENT_TYPE_HEADER
     )
-    @GET("api/v2.2/films/{filmId}")
-    suspend fun getFilmDetails(@Path("filmId") filmId:Int): Response<FilmResponseBody>
+    @GET(Constants.FILM_DESCRIPTION_ENDPOINT + "{filmId}")
+    suspend fun getFilmDetails(@Path("filmId") filmId: Int): Response<FilmResponseBody>
 
 }

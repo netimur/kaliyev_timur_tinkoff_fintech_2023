@@ -6,13 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.netimur.tinkofffintech2023.data.model.ShortFilmDetails
 import com.netimur.tinkofffintech2023.databinding.FragmentFilmDetailsBinding
-import com.netimur.tinkofffintech2023.ui.mainpage.TopFilmsViewModel
 import com.squareup.picasso.Picasso
 
 class FilmDetailsFragment : Fragment() {
@@ -59,7 +56,7 @@ class FilmDetailsFragment : Fragment() {
             filmCountries.visibility = View.INVISIBLE
             filmGenre.visibility = View.INVISIBLE
             internetConnectionErrorImage.visibility = View.VISIBLE
-            internetConnectionErrorImage.visibility = View.VISIBLE
+            internetConnectionErrorMessage.visibility = View.VISIBLE
             retryButton.visibility = View.VISIBLE
             progressBar.visibility = View.INVISIBLE
             genreLabel.visibility = View.INVISIBLE
@@ -88,7 +85,7 @@ class FilmDetailsFragment : Fragment() {
             filmPoster.visibility = View.VISIBLE
             Picasso.get().load(filmDetails.posterUrl).fit().into(binding!!.filmPoster)
             internetConnectionErrorImage.visibility = View.INVISIBLE
-            internetConnectionErrorImage.visibility = View.INVISIBLE
+            internetConnectionErrorMessage.visibility = View.INVISIBLE
             retryButton.visibility = View.INVISIBLE
             progressBar.visibility = View.INVISIBLE
             genreLabel.visibility = View.VISIBLE
@@ -111,6 +108,7 @@ class FilmDetailsFragment : Fragment() {
             genreLabel.visibility = View.INVISIBLE
             countriesLabel.visibility = View.INVISIBLE
         }
+        viewModel.loadFilmData(args.filmId)
     }
 
     override fun onDestroy() {
